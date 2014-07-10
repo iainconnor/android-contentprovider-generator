@@ -22,12 +22,10 @@ public interface ${entity.nameCamelCase}Columns extends BaseColumns {
 
     String DEFAULT_ORDER = _ID;
 
-	// @formatter:off
     String[] FULL_PROJECTION = new String[] {
             _ID,
             <#list entity.fields as field>
             ${field.nameUpperCase}<#if field_has_next>,</#if>
             </#list>
     };
-    // @formatter:on
 }

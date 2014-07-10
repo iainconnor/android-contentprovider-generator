@@ -22,34 +22,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.jraf.androidcontentprovidergenerator.model;
 
 import java.util.Locale;
 
 public class Constraint {
-    public static class Json {
-        public static final String NAME = "name";
-        public static final String DEFINITION = "definition";
-    }
+	public static class Json {
+		public static final String NAME = "name";
+		public static final String DEFINITION = "definition";
+	}
 
-    private final String mName;
-    private final String mDefinition;
+	private final String mName;
+	private final String mDefinition;
 
-    public Constraint(String name, String definition) {
-        mName = name;
-        mDefinition = definition.toLowerCase();
-    }
+	public Constraint ( String name, String definition ) {
+		mName = name;
+		mDefinition = definition.toLowerCase();
+	}
 
-    public String getNameUpperCase() {
-        return mName.toUpperCase(Locale.US);
-    }
+	public String getNameUpperCase () {
+		return mName.toUpperCase(Locale.US);
+	}
 
-    public String getDefinitionUpperCase() {
-        return mDefinition.toUpperCase(Locale.US);
-    }
+	public String getDefinitionUpperCase () {
+		return mDefinition.toUpperCase(Locale.US);
+	}
 
-    @Override
-    public String toString() {
-        return "Constraint [mName=" + mName + ", mDefinition=" + mDefinition + "]";
-    }
+	@Override
+	public String toString () {
+		return "Constraint [mName=" + mName + ", mDefinition=" + mDefinition + "]";
+	}
 }

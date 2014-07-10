@@ -34,33 +34,30 @@ public class ${entity.nameCamelCase}ContentValues extends AbstractContentValues 
         <#if !field.isNullable && !field.type.hasNotNullableJavaType()>
         if (value == null) throw new IllegalArgumentException("value for ${field.nameCamelCaseLowerCase} must not be null");
         </#if>        
-        <#switch field.type.name()>
+        <#switch field.type.jsonName>
         <#case "DATE">
-        mContentValues.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, <#if field.isNullable>value == null ? null : </#if>value.getTime());
+        contentValues.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, <#if field.isNullable>value == null ? null : </#if>value.getTime());
         <#break>
         <#case "ENUM">
-        mContentValues.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, <#if field.isNullable>value == null ? null : </#if>value.ordinal());
+        contentValues.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, <#if field.isNullable>value == null ? null : </#if>value.ordinal());
         <#break>
         <#default>
-        mContentValues.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, value);
+        contentValues.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, value);
         </#switch>
         return this;
     }
-
     <#if field.isNullable>
     public ${entity.nameCamelCase}ContentValues put${field.nameCamelCase}Null() {
-        mContentValues.putNull(${entity.nameCamelCase}Columns.${field.nameUpperCase});
+        contentValues.putNull(${entity.nameCamelCase}Columns.${field.nameUpperCase});
         return this;
     }
     </#if>
-
-    <#switch field.type.name()>
+    <#switch field.type.jsonName>
     <#case "DATE">
     public ${entity.nameCamelCase}ContentValues put${field.nameCamelCase}(<#if field.isNullable>Long<#else>long</#if> value) {
-        mContentValues.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, value);
+        contentValues.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, value);
         return this;
     }
-
     <#break>
     </#switch>
     </#list>

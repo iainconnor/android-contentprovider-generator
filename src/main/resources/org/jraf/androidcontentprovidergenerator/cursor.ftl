@@ -12,9 +12,17 @@ import ${config.providerJavaPackage}.base.AbstractCursor;
 /**
  * Cursor wrapper for the {@code ${entity.nameLowerCase}} table.
  */
-public class ${entity.nameCamelCase}Cursor extends AbstractCursor {
+public class ${entity.nameCamelCase}Cursor extends AbstractCursor<${entity.nameCamelCase}Cursor> {
     public ${entity.nameCamelCase}Cursor(Cursor cursor) {
         super(cursor);
+    }
+
+    public ${entity.nameCamelCase} peek() {
+        return new ${entity.nameCamelCase} (
+            <#list entity.fields as field>
+            get${field.nameCamelCase}()<#if field_has_next>, </#if>
+            </#list>
+        );
     }
     <#list entity.fields as field>
 
@@ -29,7 +37,7 @@ public class ${entity.nameCamelCase}Cursor extends AbstractCursor {
      </#if>
      */
     public ${field.javaTypeSimpleName} get${field.nameCamelCase}() {
-        <#switch field.type.name()>
+        <#switch field.type.jsonName>
         <#case "STRING">
         Integer index = getCachedColumnIndexOrThrow(${entity.nameCamelCase}Columns.${field.nameUpperCase});
         return getString(index);

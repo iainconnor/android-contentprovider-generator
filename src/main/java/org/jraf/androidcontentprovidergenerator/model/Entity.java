@@ -22,58 +22,93 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.jraf.androidcontentprovidergenerator.model;
+
+import org.apache.commons.lang.WordUtils;
+import org.jraf.androidcontentprovidergenerator.Main;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang.WordUtils;
-
 public class Entity {
-    private final String mName;
-    private final List<Field> mFields = new ArrayList<Field>();
-    private final List<Constraint> mConstraints = new ArrayList<Constraint>();
+	private final String mName;
+	private final List<Field> mFields = new ArrayList<Field>();
+	private final List<Constraint> mConstraints = new ArrayList<Constraint>();
+	private final List<ApiEndpoint> apiEndpoints = new ArrayList<ApiEndpoint>();
 
-    public Entity(String name) {
-        mName = name;
-    }
+	public Entity ( String name ) {
+		mName = name;
+	}
 
-    public void addField(Field field) {
-        mFields.add(field);
-    }
+	public void addApiMethod ( ApiEndpoint apiEndpoint ) {
+		apiEndpoints.add(apiEndpoint);
+	}
 
-    public List<Field> getFields() {
-        return Collections.unmodifiableList(mFields);
-    }
+	public List<ApiEndpoint> getApiEndpoints () {
+		return Collections.unmodifiableList(apiEndpoints);
+	}
 
-    public void addConstraint(Constraint constraint) {
-        mConstraints.add(constraint);
-    }
+	public void addField ( Field field ) {
+		mFields.add(field);
+	}
 
-    public List<Constraint> getConstraints() {
-        return Collections.unmodifiableList(mConstraints);
-    }
+	public List<Field> getFields () {
+		return Collections.unmodifiableList(mFields);
+	}
 
-    public String getNameCamelCase() {
-        return WordUtils.capitalizeFully(mName, new char[] { '_' }).replaceAll("_", "");
-    }
+	public void addConstraint ( Constraint constraint ) {
+		mConstraints.add(constraint);
+	}
 
-    public String getPackageName() {
-        return getNameLowerCase().replace("_", "");
-    }
+	public List<Constraint> getConstraints () {
+		return Collections.unmodifiableList(mConstraints);
+	}
 
-    public String getNameLowerCase() {
-        return mName.toLowerCase(Locale.US);
-    }
+	public String getNameCamelCase () {
+		return WordUtils.capitalizeFully(mName, new char[] {'_'}).replaceAll("_", "");
+	}
 
-    public String getNameUpperCase() {
-        return mName.toUpperCase(Locale.US);
-    }
+	public String getPackageName () {
+		return getNameLowerCase().replace("_", "");
+	}
 
-    @Override
-    public String toString() {
-        return "Entity [mName=" + mName + ", mFields=" + mFields + ", mConstraints=" + mConstraints + "]";
-    }
+	public String getNameLowerCase () {
+		return mName.toLowerCase(Locale.US);
+	}
+
+	public String getNameUpperCase () {
+		return mName.toUpperCase(Locale.US);
+	}
+
+	public List<String> getApiImports (JSONObject config) {
+		List<String> uniqueIncludes = new ArrayList<String>();
+
+		for (ApiEndpoint apiEndpoint : getApiEndpoints()) {
+			for (ApiParam apiParam : apiEndpoint.getParameters()) {
+				for (String importClass : apiParam.getType().getImports(config.getString(Main.Json.API_MODEL_JAVA_PACKAGE), config.getString(Main.Json.PROVIDER_JAVA_PACKAGE) + "." + getPackageName())) {
+					if (!uniqueIncludes.contains(importClass)) {
+						uniqueIncludes.add(importClass);
+					}
+				}
+			}
+
+			Type returnType = apiEndpoint.getReturnType();
+			for (String importClass : returnType.getImports(config.getString(Main.Json.API_MODEL_JAVA_PACKAGE), config.getString(Main.Json.PROVIDER_JAVA_PACKAGE) + "." + getPackageName())) {
+				if (!uniqueIncludes.contains(importClass)) {
+					uniqueIncludes.add(importClass);
+				}
+			}
+		}
+
+		return Collections.unmodifiableList(uniqueIncludes);
+	}
+
+	@Override
+	public String toString () {
+		return "Entity [mName=" + mName + ", mFields=" + mFields + ", mConstraints=" + mConstraints + "]";
+	}
 }

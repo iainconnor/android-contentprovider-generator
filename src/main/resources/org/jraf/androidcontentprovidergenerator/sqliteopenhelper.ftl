@@ -23,10 +23,9 @@ public class ${config.sqliteOpenHelperClassName} extends SQLiteOpenHelper {
 
     public static final String DATABASE_FILE_NAME = "${config.databaseFileName}";
     private static final int DATABASE_VERSION = ${config.databaseVersion};
-    private final Context mContext;
-    private final ${config.sqliteOpenHelperCallbacksClassName} mOpenHelperCallbacks;
+    private final Context context;
+    private final ${config.sqliteOpenHelperCallbacksClassName} openHelperCallbacks;
 
-    // @formatter:off
     <#list model.entities as entity>
     private static final String SQL_CREATE_TABLE_${entity.nameUpperCase} = "CREATE TABLE IF NOT EXISTS "
             + ${entity.nameCamelCase}Columns.TABLE_NAME + " ( "
@@ -58,7 +57,6 @@ public class ${config.sqliteOpenHelperClassName} extends SQLiteOpenHelper {
     </#if>
     </#list>
     </#list>
-    // @formatter:on
 
     public static ${config.sqliteOpenHelperClassName} newInstance(Context context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
@@ -78,8 +76,8 @@ public class ${config.sqliteOpenHelperClassName} extends SQLiteOpenHelper {
 
     private ${config.sqliteOpenHelperClassName}(Context context, String name, CursorFactory factory, int version) {
         super(context, name, factory, version);
-        mContext = context;
-        mOpenHelperCallbacks = new ${config.sqliteOpenHelperCallbacksClassName}();
+        context = context;
+        openHelperCallbacks = new ${config.sqliteOpenHelperCallbacksClassName}();
     }
 
 
@@ -95,15 +93,15 @@ public class ${config.sqliteOpenHelperClassName} extends SQLiteOpenHelper {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private ${config.sqliteOpenHelperClassName}(Context context, String name, CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
         super(context, name, factory, version, errorHandler);
-        mContext = context;
-        mOpenHelperCallbacks = new ${config.sqliteOpenHelperCallbacksClassName}();
+        context = context;
+        openHelperCallbacks = new ${config.sqliteOpenHelperCallbacksClassName}();
     }
 
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         if (BuildConfig.DEBUG) Log.d(TAG, "onCreate");
-        mOpenHelperCallbacks.onPreCreate(mContext, db);
+        openHelperCallbacks.onPreCreate(context, db);
         <#list model.entities as entity>
         db.execSQL(SQL_CREATE_TABLE_${entity.nameUpperCase});
         <#list entity.fields as field>
@@ -112,7 +110,7 @@ public class ${config.sqliteOpenHelperClassName} extends SQLiteOpenHelper {
         </#if>
         </#list>
         </#list>
-        mOpenHelperCallbacks.onPostCreate(mContext, db);
+        openHelperCallbacks.onPostCreate(context, db);
     }
 
     <#if config.enableForeignKeys >
@@ -122,12 +120,12 @@ public class ${config.sqliteOpenHelperClassName} extends SQLiteOpenHelper {
         if (!db.isReadOnly()) {
             db.execSQL("PRAGMA foreign_keys=ON;");
         }
-        mOpenHelperCallbacks.onOpen(mContext, db);
+        openHelperCallbacks.onOpen(context, db);
     }
     </#if>
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        mOpenHelperCallbacks.onUpgrade(mContext, db, oldVersion, newVersion);
+        openHelperCallbacks.onUpgrade(context, db, oldVersion, newVersion);
     }
 }

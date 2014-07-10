@@ -8,10 +8,11 @@ package ${config.providerJavaPackage}.${entity.packageName};
  */
 public enum ${field.enumName} {
     <#list field.enumValues as enumValue>
+    <#if !enumValue?? && enumValue.javadoc != "">
     /**
-     * ${enumValue.javadoc!""}
+     * ${enumValue.javadoc}
      */
+    </#if>
     ${enumValue.name},
-
     </#list>
 }

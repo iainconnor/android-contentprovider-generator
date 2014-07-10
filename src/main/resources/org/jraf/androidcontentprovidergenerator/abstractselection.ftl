@@ -28,112 +28,112 @@ public abstract class AbstractSelection <T extends AbstractSelection<?>> {
     private static final String NOT_EQ = "<>?";
     private static final String LIKE = " LIKE ?";
 
-    private StringBuilder mSelection = new StringBuilder();
-    private List<String> mSelectionArgs = new ArrayList<String>(5);
+    private StringBuilder selection = new StringBuilder();
+    private List<String> selectionArgs = new ArrayList<String>(5);
 
     protected void addEquals(String column, Object[] value) {
-        mSelection.append(column);
+        selection.append(column);
 
         if (value == null) {
             // Single null value
-            mSelection.append(IS_NULL);
+            selection.append(IS_NULL);
         } else if (value.length > 1) {
             // Multiple values ('in' clause)
-            mSelection.append(IN);
+            selection.append(IN);
             for (int i = 0; i < value.length; i++) {
-                mSelection.append("?");
+                selection.append("?");
                 if (i < value.length - 1) {
-                    mSelection.append(COMMA);
+                    selection.append(COMMA);
                 }
-                mSelectionArgs.add(valueOf(value[i]));
+                selectionArgs.add(valueOf(value[i]));
             }
-            mSelection.append(PAREN_CLOSE);
+            selection.append(PAREN_CLOSE);
         } else {
             // Single value
             if (value[0] == null) {
                 // Single null value
-                mSelection.append(IS_NULL);
+                selection.append(IS_NULL);
             } else {
                 // Single not null value
-                mSelection.append(EQ);
-                mSelectionArgs.add(valueOf(value[0]));
+                selection.append(EQ);
+                selectionArgs.add(valueOf(value[0]));
             }
         }
     }
 
     protected void addNotEquals(String column, Object[] value) {
-        mSelection.append(column);
+        selection.append(column);
 
         if (value == null) {
             // Single null value
-            mSelection.append(IS_NOT_NULL);
+            selection.append(IS_NOT_NULL);
         } else if (value.length > 1) {
             // Multiple values ('in' clause)
-            mSelection.append(NOT_IN);
+            selection.append(NOT_IN);
             for (int i = 0; i < value.length; i++) {
-                mSelection.append("?");
+                selection.append("?");
                 if (i < value.length - 1) {
-                    mSelection.append(COMMA);
+                    selection.append(COMMA);
                 }
-                mSelectionArgs.add(valueOf(value[i]));
+                selectionArgs.add(valueOf(value[i]));
             }
-            mSelection.append(PAREN_CLOSE);
+            selection.append(PAREN_CLOSE);
         } else {
             // Single value
             if (value[0] == null) {
                 // Single null value
-                mSelection.append(IS_NOT_NULL);
+                selection.append(IS_NOT_NULL);
             } else {
                 // Single not null value
-                mSelection.append(NOT_EQ);
-                mSelectionArgs.add(valueOf(value[0]));
+                selection.append(NOT_EQ);
+                selectionArgs.add(valueOf(value[0]));
             }
         }
     }
 
     protected void addLike(String column, String[] values) {
-        mSelection.append(PAREN_OPEN);
+        selection.append(PAREN_OPEN);
         for (int i = 0; i < values.length; i++) {
-            mSelection.append(column);
-            mSelection.append(LIKE);
-            mSelectionArgs.add(values[i]);
+            selection.append(column);
+            selection.append(LIKE);
+            selectionArgs.add(values[i]);
             if (i < values.length - 1) {
-                mSelection.append(OR);
+                selection.append(OR);
             }
         }
-        mSelection.append(PAREN_CLOSE);
+        selection.append(PAREN_CLOSE);
     }
 
     protected void addGreaterThan(String column, Object value) {
-        mSelection.append(column);
-        mSelection.append(GT);
-        mSelectionArgs.add(valueOf(value));
+        selection.append(column);
+        selection.append(GT);
+        selectionArgs.add(valueOf(value));
     }
 
     protected void addGreaterThanOrEquals(String column, Object value) {
-        mSelection.append(column);
-        mSelection.append(GT_EQ);
-        mSelectionArgs.add(valueOf(value));
+        selection.append(column);
+        selection.append(GT_EQ);
+        selectionArgs.add(valueOf(value));
     }
 
     protected void addLessThan(String column, Object value) {
-        mSelection.append(column);
-        mSelection.append(LT);
-        mSelectionArgs.add(valueOf(value));
+        selection.append(column);
+        selection.append(LT);
+        selectionArgs.add(valueOf(value));
     }
 
     protected void addLessThanOrEquals(String column, Object value) {
-        mSelection.append(column);
-        mSelection.append(LT_EQ);
-        mSelectionArgs.add(valueOf(value));
+        selection.append(column);
+        selection.append(LT_EQ);
+        selectionArgs.add(valueOf(value));
     }
 
     public void addRaw(String raw, Object... args) {
-        mSelection.append(" ");
-        mSelection.append(raw);
-        mSelection.append(" ");
+        selection.append(" ");
+        selection.append(raw);
+        selection.append(" ");
         for (Object arg : args) {
-            mSelectionArgs.add(valueOf(arg));
+            selectionArgs.add(valueOf(arg));
         }
     }
 
@@ -150,25 +150,25 @@ public abstract class AbstractSelection <T extends AbstractSelection<?>> {
 
     @SuppressWarnings("unchecked")
     public T openParen() {
-        mSelection.append(PAREN_OPEN);
+        selection.append(PAREN_OPEN);
         return (T) this;
     }
 
     @SuppressWarnings("unchecked")
     public T closeParen() {
-        mSelection.append(PAREN_CLOSE);
+        selection.append(PAREN_CLOSE);
         return (T) this;
     }
 
     @SuppressWarnings("unchecked")
     public T and() {
-        mSelection.append(AND);
+        selection.append(AND);
         return (T) this;
     }
 
     @SuppressWarnings("unchecked")
     public T or() {
-        mSelection.append(OR);
+        selection.append(OR);
         return (T) this;
     }
 
@@ -214,16 +214,16 @@ public abstract class AbstractSelection <T extends AbstractSelection<?>> {
      * Returns the selection produced by this object.
      */
     public String sel() {
-        return mSelection.toString();
+        return selection.toString();
     }
 
     /**
      * Returns the selection arguments produced by this object.
      */
     public String[] args() {
-        int size = mSelectionArgs.size();
+        int size = selectionArgs.size();
         if (size == 0) return null;
-        return mSelectionArgs.toArray(new String[size]);
+        return selectionArgs.toArray(new String[size]);
     }
 
 

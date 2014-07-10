@@ -22,42 +22,56 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.jraf.androidcontentprovidergenerator.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.json.JSONObject;
+
+import java.util.*;
 
 public class Model {
-    private static final Model INSTANCE = new Model();
+	private static final Model INSTANCE = new Model();
 
-    public static Model get() {
-        return INSTANCE;
-    }
+	public static Model get () {
+		return INSTANCE;
+	}
 
-    private Model() {}
+	private Model () {
+	}
 
-    private final List<Entity> mEntities = new ArrayList<Entity>();
-    private String mHeader;
+	private final List<Entity> mEntities = new ArrayList<Entity>();
+	private String mHeader;
 
-    public void addEntity(Entity entity) {
-        mEntities.add(entity);
-    }
+	public void addEntity ( Entity entity ) {
+		mEntities.add(entity);
+	}
 
-    public List<Entity> getEntities() {
-        return Collections.unmodifiableList(mEntities);
-    }
+	public List<String> getApiImports (JSONObject config) {
+		List<String> uniqueIncludes = new ArrayList<String>();
 
-    public void setHeader(String header) {
-        mHeader = header;
-    }
+		for (Entity entity : getEntities()) {
+			Set<String> set = new HashSet<String>(uniqueIncludes);
+			set.addAll(entity.getApiImports(config));
+			uniqueIncludes = new ArrayList<String>(set);
+		}
 
-    public String getHeader() {
-        return mHeader;
-    }
+		return Collections.unmodifiableList(uniqueIncludes);
+	}
 
-    @Override
-    public String toString() {
-        return mEntities.toString();
-    }
+	public List<Entity> getEntities () {
+		return Collections.unmodifiableList(mEntities);
+	}
+
+	public void setHeader ( String header ) {
+		mHeader = header;
+	}
+
+	public String getHeader () {
+		return mHeader;
+	}
+
+	@Override
+	public String toString () {
+		return mEntities.toString();
+	}
 }

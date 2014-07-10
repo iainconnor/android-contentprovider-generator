@@ -10,8 +10,10 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.provider.BaseColumns;
 
-public abstract class AbstractCursor extends CursorWrapper {
-	private HashMap<String, Integer> mColumnIndexes = new HashMap<String, Integer>();
+import com.venmo.cursor.IterableCursorWrapper;
+
+public abstract class AbstractCursor<T> extends IterableCursorWrapper<T> {
+	private HashMap<String, Integer> columnIndexes = new HashMap<String, Integer>();
 	
     public AbstractCursor(Cursor cursor) {
         super(cursor);
@@ -22,10 +24,10 @@ public abstract class AbstractCursor extends CursorWrapper {
     }
 
     protected int getCachedColumnIndexOrThrow(String colName) {
-    	Integer index = mColumnIndexes.get(colName);
+    	Integer index = columnIndexes.get(colName);
         if (index == null) {
         	index = getColumnIndexOrThrow(colName);
-        	mColumnIndexes.put(colName, index);
+        	columnIndexes.put(colName, index);
         }
         return index;
     }

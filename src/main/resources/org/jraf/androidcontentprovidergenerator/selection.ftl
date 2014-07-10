@@ -56,7 +56,7 @@ public class ${entity.nameCamelCase}Selection extends AbstractSelection<${entity
     }
 
     <#list entity.fields as field>
-    <#switch field.type.name()>
+    <#switch field.type.jsonName>
     <#case "BOOLEAN">
 
     public ${entity.nameCamelCase}Selection ${field.nameCamelCaseLowerCase}(${field.javaTypeSimpleName} value) {
@@ -77,7 +77,7 @@ public class ${entity.nameCamelCase}Selection extends AbstractSelection<${entity
     }
 
     </#switch>
-    <#switch field.type.name()>
+    <#switch field.type.jsonName>
     <#case "DATE">
     public ${entity.nameCamelCase}Selection ${field.nameCamelCaseLowerCase}(<#if field.isNullable>Long<#else>long</#if>... value) {
         addEquals(${entity.nameCamelCase}Columns.${field.nameUpperCase}, <#if field.isNullable>value<#else>toObjectArray(value)</#if>);

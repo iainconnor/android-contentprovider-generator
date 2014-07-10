@@ -22,172 +22,109 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.androidcontentprovidergenerator.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+package org.jraf.androidcontentprovidergenerator.model;
 
 import org.apache.commons.lang.WordUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 public class Field {
-    public static class Json {
-        public static final String NAME = "name";
-        public static final String TYPE = "type";
-        public static final String INDEX = "index";
-        public static final String NULLABLE = "nullable";
-        public static final String DEFAULT_VALUE = "default_value";
-        public static final String ENUM_NAME = "enumName";
-        public static final String ENUM_VALUES = "enumValues";
+	public static class Json {
+		public static final String NAME = "name";
+		public static final String TYPE = "type";
+		public static final String INDEX = "index";
+		public static final String NULLABLE = "nullable";
+		public static final String DEFAULT_VALUE = "defaultValue";
+		public static final String ENUM_NAME = "enumName";
+		public static final String ENUM_VALUES = "enumValues";
+	}
 
-        private static final String TYPE_STRING = "String";
-        private static final String TYPE_INTEGER = "Integer";
-        private static final String TYPE_LONG = "Long";
-        private static final String TYPE_FLOAT = "Float";
-        private static final String TYPE_DOUBLE = "Double";
-        private static final String TYPE_BOOLEAN = "Boolean";
-        private static final String TYPE_DATE = "Date";
-        private static final String TYPE_BYTE_ARRAY = "byte[]";
-        private static final String TYPE_ENUM = "enum";
-    }
+	private final String name;
+	private final Type type;
+	private final boolean isIndex;
+	private final boolean isNullable;
+	private final String defaultValue;
+	private final String enumName;
+	private final List<EnumValue> enumValues = new ArrayList<EnumValue>();
 
-    public static enum Type {
-        // @formatter:off
-        STRING(Json.TYPE_STRING, "TEXT", String.class, String.class),
-        INTEGER(Json.TYPE_INTEGER, "INTEGER", Integer.class, int.class),
-        LONG(Json.TYPE_LONG, "INTEGER", Long.class, long.class),
-        FLOAT(Json.TYPE_FLOAT, "REAL", Float.class, float.class),
-        DOUBLE(Json.TYPE_DOUBLE, "REAL", Double.class, double.class),
-        BOOLEAN(Json.TYPE_BOOLEAN, "INTEGER", Boolean.class, boolean.class),
-        DATE(Json.TYPE_DATE, "INTEGER", Date.class, Date.class),
-        BYTE_ARRAY(Json.TYPE_BYTE_ARRAY, "BLOB", byte[].class, byte[].class),
-        ENUM(Json.TYPE_ENUM, "INTEGER", null, null),
-        // @formatter:on
-        ;
+	public Field ( String name, String type, boolean isIndex, boolean isNullable, String defaultValue, String enumName, List<EnumValue> enumValues ) {
+		this.name = name;
+		this.isIndex = isIndex;
+		this.isNullable = isNullable;
+		this.defaultValue = defaultValue;
+		this.enumName = enumName;
+		this.enumValues.addAll(enumValues);
 
-        private String mSqlType;
-        private Class<?> mNullableJavaType;
-        private Class<?> mNotNullableJavaType;
+		this.type = Type.fromJsonName(type, enumName);
+	}
 
-        private Type(String jsonName, String sqlType, Class<?> nullableJavaType, Class<?> notNullableJavaType) {
-            mSqlType = sqlType;
-            mNullableJavaType = nullableJavaType;
-            mNotNullableJavaType = notNullableJavaType;
-            sJsonNames.put(jsonName, this);
-        }
+	public String getNameUpperCase () {
+		return name.toUpperCase(Locale.US);
+	}
 
-        public static Type fromJsonName(String jsonName) {
-            Type res = sJsonNames.get(jsonName);
-            if (res == null) throw new IllegalArgumentException("The type '" + jsonName + "' is unknown");
-            return res;
-        }
+	public String getNameLowerCase () {
+		return name.toLowerCase(Locale.US);
+	}
 
-        public String getSqlType() {
-            return mSqlType;
-        }
+	public String getNameCamelCase () {
+		return WordUtils.capitalizeFully(name, new char[] {'_'}).replaceAll("_", "");
+	}
 
-        public Class<?> getNullableJavaType() {
-            return mNullableJavaType;
-        }
+	public String getNameCamelCaseLowerCase () {
+		return WordUtils.uncapitalize(getNameCamelCase());
+	}
 
-        public Class<?> getNotNullableJavaType() {
-            return mNotNullableJavaType;
-        }
+	public String getEnumName () {
+		return enumName;
+	}
 
-        public boolean hasNotNullableJavaType() {
-            if (this == ENUM) return false;
-            return !mNullableJavaType.equals(mNotNullableJavaType);
-        }
-    }
+	public List<EnumValue> getEnumValues () {
+		return enumValues;
+	}
 
-    private static HashMap<String, Type> sJsonNames = new HashMap<String, Type>();
+	public Type getType () {
+		return type;
+	}
 
-    private final String mName;
-    private final Type mType;
-    private final boolean mIsIndex;
-    private final boolean mIsNullable;
-    private final String mDefaultValue;
-    private final String mEnumName;
-    private final List<EnumValue> mEnumValues = new ArrayList<EnumValue>();
+	public boolean getIsIndex () {
+		return isIndex;
+	}
 
-    public Field(String name, String type, boolean isIndex, boolean isNullable, String defaultValue, String enumName, List<EnumValue> enumValues) {
-        mName = name;
-        mType = Type.fromJsonName(type);
-        mIsIndex = isIndex;
-        mIsNullable = isNullable;
-        mDefaultValue = defaultValue;
-        mEnumName = enumName;
-        mEnumValues.addAll(enumValues);
-    }
+	public boolean getIsNullable () {
+		return isNullable;
+	}
 
-    public String getNameUpperCase() {
-        return mName.toUpperCase(Locale.US);
-    }
+	public String getDefaultValue () {
+		return defaultValue;
+	}
 
-    public String getNameLowerCase() {
-        return mName.toLowerCase(Locale.US);
-    }
+	public boolean getHasDefaultValue () {
+		return defaultValue != null && defaultValue.length() > 0;
+	}
 
-    public String getNameCamelCase() {
-        return WordUtils.capitalizeFully(mName, new char[] { '_' }).replaceAll("_", "");
-    }
+	public String getJavaTypeSimpleName () {
+		if (type.getJsonName().equals(Type.Json.TYPE_ENUM)) {
+			return enumName;
+		}
+		if (isNullable) {
+			return type.getNullableJavaType().getSimpleName();
+		}
+		return type.getNotNullableJavaType().getSimpleName();
+	}
 
-    public String getNameCamelCaseLowerCase() {
-        return WordUtils.uncapitalize(getNameCamelCase());
-    }
+	public boolean getIsConvertionNeeded () {
+		return !isNullable && type.hasNotNullableJavaType();
+	}
 
-    public String getEnumName() {
-        return mEnumName;
-    }
+	public boolean isEnum () {
+		return type.getJsonName().equals(Type.Json.TYPE_ENUM);
+	}
 
-    public List<EnumValue> getEnumValues() {
-        return mEnumValues;
-    }
-
-    public Type getType() {
-        return mType;
-    }
-
-    public boolean getIsIndex() {
-        return mIsIndex;
-    }
-
-    public boolean getIsNullable() {
-        return mIsNullable;
-    }
-
-    public String getDefaultValue() {
-        return mDefaultValue;
-    }
-
-    public boolean getHasDefaultValue() {
-        return mDefaultValue != null && mDefaultValue.length() > 0;
-    }
-
-    public String getJavaTypeSimpleName() {
-        if (mType == Type.ENUM) {
-            return mEnumName;
-        }
-        if (mIsNullable) {
-            return mType.getNullableJavaType().getSimpleName();
-        }
-        return mType.getNotNullableJavaType().getSimpleName();
-    }
-
-    public boolean getIsConvertionNeeded() {
-        return !mIsNullable && mType.hasNotNullableJavaType();
-    }
-
-    public boolean isEnum() {
-        return mType == Type.ENUM;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Field [mName=" + mName + ", mType=" + mType + ", mIsIndex=" + mIsIndex + ", mIsNullable=" + mIsNullable + ", mDefaultValue=" + mDefaultValue
-                + ", mEnumName=" + mEnumName + ", mEnumValues=" + mEnumValues + "]";
-    }
+	@Override
+	public String toString () {
+		return "Field [name=" + name + ", type=" + type + ", isIndex=" + isIndex + ", isNullable=" + isNullable + ", defaultValue=" + defaultValue + ", enumName=" + enumName + ", enumValues=" + enumValues + "]";
+	}
 }

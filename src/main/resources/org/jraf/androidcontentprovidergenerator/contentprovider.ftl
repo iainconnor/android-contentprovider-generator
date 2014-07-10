@@ -45,8 +45,6 @@ public class ${config.providerClassName} extends ContentProvider {
     <#assign i = i + 1>
 
     </#list>
-
-
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
@@ -56,7 +54,7 @@ public class ${config.providerClassName} extends ContentProvider {
         </#list>
     }
 
-    private ${config.sqliteOpenHelperClassName} m${config.sqliteOpenHelperClassName};
+    private ${config.sqliteOpenHelperClassName} openHelper;
 
     @Override
     public boolean onCreate() {
@@ -77,7 +75,7 @@ public class ${config.providerClassName} extends ContentProvider {
             }
         }
         
-        m${config.sqliteOpenHelperClassName} = ${config.sqliteOpenHelperClassName}.newInstance(getContext());
+        openHelper = ${config.sqliteOpenHelperClassName}.newInstance(getContext());
         return true;
     }
 
@@ -100,7 +98,7 @@ public class ${config.providerClassName} extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         if (BuildConfig.DEBUG) Log.d(TAG, "insert uri=" + uri + " values=" + values);
         String table = uri.getLastPathSegment();
-        long rowId = m${config.sqliteOpenHelperClassName}.getWritableDatabase().insertOrThrow(table, null, values);
+        long rowId = openHelper.getWritableDatabase().insertOrThrow(table, null, values);
         if (rowId == -1) return null;
         String notify;
         if (rowId != -1 && ((notify = uri.getQueryParameter(QUERY_NOTIFY)) == null || "true".equals(notify))) {
@@ -113,7 +111,7 @@ public class ${config.providerClassName} extends ContentProvider {
     public int bulkInsert(Uri uri, ContentValues[] values) {
         if (BuildConfig.DEBUG) Log.d(TAG, "bulkInsert uri=" + uri + " values.length=" + values.length);
         String table = uri.getLastPathSegment();
-        SQLiteDatabase db = m${config.sqliteOpenHelperClassName}.getWritableDatabase();
+        SQLiteDatabase db = openHelper.getWritableDatabase();
         int res = 0;
         db.beginTransaction();
         try {
@@ -141,7 +139,7 @@ public class ${config.providerClassName} extends ContentProvider {
         if (BuildConfig.DEBUG)
             Log.d(TAG, "update uri=" + uri + " values=" + values + " selection=" + selection + " selectionArgs=" + Arrays.toString(selectionArgs));
         QueryParams queryParams = getQueryParams(uri, selection);
-        int res = m${config.sqliteOpenHelperClassName}.getWritableDatabase().update(queryParams.table, values, queryParams.selection, selectionArgs);
+        int res = openHelper.getWritableDatabase().update(queryParams.table, values, queryParams.selection, selectionArgs);
         String notify;
         if (res != 0 && ((notify = uri.getQueryParameter(QUERY_NOTIFY)) == null || "true".equals(notify))) {
             getContext().getContentResolver().notifyChange(uri, null);
@@ -153,7 +151,7 @@ public class ${config.providerClassName} extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         if (BuildConfig.DEBUG) Log.d(TAG, "delete uri=" + uri + " selection=" + selection + " selectionArgs=" + Arrays.toString(selectionArgs));
         QueryParams queryParams = getQueryParams(uri, selection);
-        int res = m${config.sqliteOpenHelperClassName}.getWritableDatabase().delete(queryParams.table, queryParams.selection, selectionArgs);
+        int res = openHelper.getWritableDatabase().delete(queryParams.table, queryParams.selection, selectionArgs);
         String notify;
         if (res != 0 && ((notify = uri.getQueryParameter(QUERY_NOTIFY)) == null || "true".equals(notify))) {
             getContext().getContentResolver().notifyChange(uri, null);
@@ -168,7 +166,7 @@ public class ${config.providerClassName} extends ContentProvider {
             Log.d(TAG, "query uri=" + uri + " selection=" + selection + " selectionArgs=" + Arrays.toString(selectionArgs) + " sortOrder=" + sortOrder
                     + " groupBy=" + groupBy);
         QueryParams queryParams = getQueryParams(uri, selection);
-        Cursor res = m${config.sqliteOpenHelperClassName}.getReadableDatabase().query(queryParams.table, projection, queryParams.selection, selectionArgs, groupBy,
+        Cursor res = openHelper.getReadableDatabase().query(queryParams.table, projection, queryParams.selection, selectionArgs, groupBy,
                 null, sortOrder == null ? queryParams.orderBy : sortOrder);
         res.setNotificationUri(getContext().getContentResolver(), uri);
         return res;
@@ -180,7 +178,7 @@ public class ${config.providerClassName} extends ContentProvider {
         for (ContentProviderOperation operation : operations) {
             urisToNotify.add(operation.getUri());
         }
-        SQLiteDatabase db = m${config.sqliteOpenHelperClassName}.getWritableDatabase();
+        SQLiteDatabase db = openHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             int numOperations = operations.size();

@@ -22,22 +22,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.jraf.androidcontentprovidergenerator.model;
 
 public class EnumValue {
-    private final String mName;
-    private final String mJavadoc;
+	private final String mName;
+	private final String mJavadoc;
 
-    public EnumValue(String name, String javadoc) {
-        mName = name;
-        mJavadoc = javadoc;
-    }
+	public EnumValue ( String name, String javadoc ) {
+		mName = name;
+		mJavadoc = javadoc;
+	}
 
-    public String getName() {
-        return mName;
-    }
+	public String getName () {
+		return mName;
+	}
 
-    public String getJavadoc() {
-        return mJavadoc;
-    }
+	public String getJavadoc () {
+		return mJavadoc;
+	}
 }
